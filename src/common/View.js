@@ -12,10 +12,11 @@ function View(element, calendar, viewName) {
 	t.trigger = trigger;
 	t.isEventDraggable = isEventDraggable;
 	t.isEventResizable = isEventResizable;
-	t.reportEvents = reportEvents;
+	t.setEventData = setEventData;
+	t.clearEventData = clearEventData;
 	t.eventEnd = eventEnd;
 	t.reportEventElement = reportEventElement;
-	t.reportEventClear = reportEventClear;
+	t.triggerEventUnrenderHandlers = triggerEventUnrenderHandlers;
 	t.eventElementHandlers = eventElementHandlers;
 	t.showEvents = showEvents;
 	t.hideEvents = hideEvents;
@@ -95,8 +96,7 @@ function View(element, calendar, viewName) {
 	------------------------------------------------------------------------------*/
 	
 	
-	// report when view receives new events
-	function reportEvents(events) { // events are already normalized at this point
+	function setEventData(events) { // events are already normalized at this point
 		eventsByID = {};
 		var i, len=events.length, event;
 		for (i=0; i<len; i++) {
@@ -107,6 +107,12 @@ function View(element, calendar, viewName) {
 				eventsByID[event._id] = [event];
 			}
 		}
+	}
+
+
+	function clearEventData() {
+		eventElements = [];
+		eventElementsByID = {};
 	}
 	
 	
@@ -130,11 +136,15 @@ function View(element, calendar, viewName) {
 			eventElementsByID[event._id] = [element];
 		}
 	}
-	
-	
-	function reportEventClear() {
-		eventElements = [];
-		eventElementsByID = {};
+
+
+	function triggerEventUnrenderHandlers() {
+		$.each(eventElementsByID, function(eventID, element) {
+			var events = eventsByID[eventID];
+			for (var i=0; i<events.length; i++) {
+				trigger('eventUnrender', events[i], events[i], element);
+			}
+		});
 	}
 	
 	

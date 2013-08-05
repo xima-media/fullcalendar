@@ -31,6 +31,7 @@ function AgendaView(element, calendar, viewName) {
 	t.setHeight = setHeight;
 	t.beforeHide = beforeHide;
 	t.afterShow = afterShow;
+	t.afterRender = afterRender;
 	t.defaultEventEnd = defaultEventEnd;
 	t.timePosition = timePosition;
 	t.getIsCellAllDay = getIsCellAllDay;
@@ -67,7 +68,6 @@ function AgendaView(element, calendar, viewName) {
 	AgendaEventRenderer.call(t);
 	var opt = t.opt;
 	var trigger = t.trigger;
-	var clearEvents = t.clearEvents;
 	var renderOverlay = t.renderOverlay;
 	var clearOverlays = t.clearOverlays;
 	var reportSelection = t.reportSelection;
@@ -142,11 +142,12 @@ function AgendaView(element, calendar, viewName) {
 	function renderAgenda(c) {
 		colCnt = c;
 		updateOptions();
-		if (!dayTable) {
+
+		if (!dayTable) { // first time rendering?
 			buildSkeleton(); // builds day table, slot area, events containers
-		}else{
+		}
+		else {
 			buildDayTable(); // rebuilds day table
-			clearEvents();
 		}
 	}
 	
@@ -451,10 +452,6 @@ function AgendaView(element, calendar, viewName) {
 
 		snapRatio = opt('slotMinutes') / snapMinutes;
 		snapHeight = slotHeight / snapRatio;
-		
-		if (dateChanged) {
-			resetScroll();
-		}
 	}
 	
 	
@@ -530,6 +527,11 @@ function AgendaView(element, calendar, viewName) {
 	
 	function afterShow() {
 		slotScroller.scrollTop(savedScrollTop);
+	}
+
+
+	function afterRender() { // after the view has been freshly rendered and sized
+		resetScroll();
 	}
 	
 	

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href='../build/out/fullcalendar.css' rel='stylesheet' />
+<link href='../build/out/fullcalendar.print.css' rel='stylesheet' media='print' />
+<script src='../build/out/jquery.js'></script>
+<script src='../build/out/jquery-ui.js'></script>
+<script src='../build/out/fullcalendar.js'></script>
+<script src='../build/out/gcal.js'></script>
+<script>
+
+	/*
+	ORDER OF EVENTS:
+		
+		Initial render / switching views
+			(if a previous view)
+				- viewExit (if it returns false, stop here)
+				- viewEventsUnrender
+				- viewUnrender
+			- viewRender
+			- viewEnter
+			- viewEventsRender (this might trigger immediately after viewRender instead, if there are no async event sources)
+
+		Moving date range within the same view:
+			- viewEventsUnrender
+			- viewUnrender
+			- viewRender
+			- viewEventsRender
+
+	*/
+
+	var date = new Date();
+	var d = date.getDate();
+	var m = date.getMonth();
+	var y = date.getFullYear();
+
+	var verbose = false;
+
+	$(document).ready(function() {
+		$('#calendar').fullCalendar({
+			
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,basicWeek,agendaDay,basicDay'
+			},
+			editable: true,
+			selectable: true,
+
+			viewEnter: function(view) {
+				console.log('viewEnter');
+				if (verbose) {
+					console.log(' this', this);
+					console.log(' view', view);
+				}
+			},
+
+			viewExit: function(oldView) {
+				console.log('viewExit');
+				if (verbose) {
+					console.log(' this', this);
+					console.log(' oldView', oldView);
+				}
+			},
+
+			// QUESTION: trigger viewRender when a user-resize happens???
+			// view sizing?
+			// related to element positioning?
+
+			viewResize: function(view, element) {
+				console.log('viewResize');
+				if (verbose) {
+					console.log(' this', this);
+					console.log(' view', view);
+					console.log(' element', element);
+				}
+			},
+
+			viewRender: function(view, element) {
+				console.log('viewRender');
+				if (verbose) {
+					console.log(' this', this);
+					console.log(' view', view);
+					console.log(' element', element);
+				}
+				//alert('done render!');
+			},
+
+			viewUnrender: function(view, element) {
+				console.log('viewUnrender');
+				if (verbose) {
+					console.log(' this', this);
+					console.log(' view', view);
+					console.log(' element', element);
+				}
+			},
+
+			viewEventsRender: function() {
+				console.log('viewEventsRender');
+				if (verbose) {
+					console.log(' this', this);
+				}
+			},
+
+			viewEventsUnrender: function() {
+				console.log('viewEventsUnrender');
+				if (verbose) {
+					console.log(' this', this);
+				}
+			},
+
+
+			/*
+			eventUnrender: function(event, element) {
+				console.log('eventUnrender');
+				if (verbose) {
+					console.log(' this', this);
+					console.log(' event', event);
+					console.log(' element', element);
+				}
+			},
+			// TODO: eventPosition
+			*/
+
+
+			/*
+			// DEPRECATED
+
+			viewDisplay: function(view) {
+				console.log('viewDisplay');
+				if (verbose) {
+					console.log('The new title of the view is ' + view.title);
+				}
+			},
+
+			eventAfterAllRender: function() {
+				console.log('eventAfterAllRender');
+			},
+			*/
+			
+			
+			eventSources: [
+				{
+					url: "http://www.google.com/calendar/feeds/usa__en%40holiday.calendar.google.com/public/basic",
+					editable: true,
+					className: 'holiday'
+				},
+				{
+					events: [
+						{
+							title: 'All Day Event',
+							start: new Date(y, m, 1)
+						},
+						{
+							title: 'Long Event',
+							start: new Date(y, m, d-5),
+							end: new Date(y, m, d-2)
+						},
+						{
+							id: 999,
+							title: 'Repeating Event',
+							start: new Date(y, m, d-3, 16, 0),
+							allDay: false
+						},
+						{
+							id: 999,
+							title: 'Repeating Event',
+							start: new Date(y, m, d+4, 16, 0),
+							allDay: false
+						},
+						{
+							id: 888,
+							title: 'Meeting',
+							start: new Date(y, m, d, 10, 30),
+							allDay: false
+						},
+						{
+							id: 777,
+							title: 'Lunch',
+							start: new Date(y, m, d, 12, 0),
+							end: new Date(y, m, d, 14, 0),
+							allDay: false
+						},
+						{
+							title: 'Birthday Party',
+							start: new Date(y, m, d+1, 19, 0),
+							end: new Date(y, m, d+1, 22, 30),
+							allDay: false
+						},
+						{
+							title: 'Click for Google',
+							start: new Date(y, m, 28),
+							end: new Date(y, m, 29),
+							url: 'http://google.com/'
+						}
+					]
+				}
+			]
+		});
+	});
+
+
+	function hyperJump() {console.log('hyperJump');
+		$('#calendar').fullCalendar('changeView', 'agendaWeek');
+		//alert('pause');
+		$('#calendar').fullCalendar('gotoDate', new Date(y, m+2, d));
+	}
+
+</script>
+</head>
+<body style='font-size:14px'>
+<button onclick='hyperJump()'>changeView+gotoDate</button>
+<div id='calendar' style='width:75%;margin:20px auto 0;font-family:arial'></div>
+</body>
+</html>
