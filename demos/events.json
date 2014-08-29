@@ -1,17 +1,12 @@
-[
-{
-id: "resource1",
-name: "Resource 1"
-},
-{
-id: "resource2",
-name: "Resource 2"
-},
-{
-id: "resource3",
-name: "Resource 3",
-className: [
-"red"
-]
-}
-]
+[{
+      "id": "resource1",
+      "name": "Resource 1"
+    }, {
+      "id": "resource2",
+      "name": "Resource 2"
+    }, {
+      "id": "resource3",
+      "name": "Resource 3",
+      "className": ["red"]
+    }]
+
