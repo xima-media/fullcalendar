@@ -1,0 +1,1 @@
+(function(e){"function"==typeof define&&define.amd?define(["jquery","moment"],e):e(jQuery,moment)})(function(e,t){t.lang("en"),e.fullCalendar.lang("en"),e.datepicker&&e.datepicker.setDefaults(e.datepicker.regional[""])});
