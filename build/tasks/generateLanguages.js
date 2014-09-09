@@ -207,9 +207,4 @@ module.exports = function(grunt) {
 		return js;
 	}
 
-
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> upstream/master
