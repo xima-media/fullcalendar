@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 		});
 
 		// code for resetting the language back to English
-		combinedJS += '\nmoment.lang("en");';
+		combinedJS += '\n(moment.locale || moment.lang).call(moment, "en");'; // works with moment-pre-2.8
 		combinedJS += '\n$.fullCalendar.lang("en");';
 		combinedJS += '\nif ($.datepicker) $.datepicker.setDefaults($.datepicker.regional[""]);';
 
@@ -133,9 +133,11 @@ module.exports = function(grunt) {
 			}
 		);
 
-		js = js.replace( // replace the `return` statement so execution continues
-			/^(\s*)return moment\.lang\(/m,
-			'$1moment.lang('
+		// replace the `return` statement so execution continues
+		// compatible with moment-pre-2.8
+		js = js.replace(
+			/^(\s*)return moment\.(defineLocale|lang)\(/m,
+			'$1(moment.defineLocale || moment.lang).call(moment, '
 		);
 
 		return js;
@@ -149,7 +151,7 @@ module.exports = function(grunt) {
 			return '-' + m1.toUpperCase();
 		});
 
-		var path = pathLib.join(config.datepicker, 'jquery.ui.datepicker-' + datepickerLangCode + '.js');
+		var path = config.datepicker + '/datepicker-' + datepickerLangCode + '.js';
 		var js;
 
 		try {
@@ -159,11 +161,11 @@ module.exports = function(grunt) {
 			return false;
 		}
 
-		js = js.replace(
-			/^jQuery\([\S\s]*?\{([\S\s]*)\}\);?/m, // inside the jQuery(function) wrap,
-			function(m0, body) {                   // use only the function body, modified.
+		js = js.replace( // remove the UMD wrap
+			/\(\s*function[\S\s]*?function\s*\(\s*datepicker\s*\)\s*\{([\S\s]*)\}\)\);?/m,
+			function(m0, body) { // use only the function body, modified
 
-				var match = body.match(/\$\.datepicker\.regional[\S\s]*?(\{[\S\s]*?\});?/);
+				var match = body.match(/datepicker\.regional[\S\s]*?(\{[\S\s]*?\});?/);
 				var props = match[1];
 
 				// remove 1 level of tab indentation
