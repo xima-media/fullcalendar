@@ -151,7 +151,7 @@ module.exports = function(grunt) {
 			return '-' + m1.toUpperCase();
 		});
 
-		var path = config.datepicker + '/datepicker-' + datepickerLangCode + '.js';
+		var path = pathLib.join(config.datepicker, 'datepicker-' + datepickerLangCode + '.js');
 		var js;
 
 		try {

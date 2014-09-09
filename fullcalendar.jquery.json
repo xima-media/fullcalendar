@@ -1,17 +1,14 @@
 {
   "name": "fullcalendar",
-  "version": "2.0.2",
+  "version": "2.1.1",
 
   "description": "Full-sized drag & drop event calendar with resources",
   "keywords": [ "calendar", "event", "full-sized", "resources" ],
   "homepage": "http://arshaw.com/fullcalendar/",
 
   "dependencies": {
-    "jquery": "~1.11.1",
+    "jquery": ">=1.7.1",
     "moment": ">=2.5.0"
-  },
-  "optionalDependencies": {
-    "jquery-ui": "~1.10.4"
   },
 
   "title": "FullCalendar",
@@ -28,9 +25,9 @@
   ],
 
   "author": {
-    "name": "Adam Shaw, Sean Kenny",
-    "email": "srkenny@gmail.com",
-    "url": "http://seankenny.me/"
+    "name": "Adam Shaw",
+    "email": "arshaw@arshaw.com",
+    "url": "http://arshaw.com/"
   },
-  "copyright": "2014 Adam Shaw, Sean Kenny"
+  "copyright": "2013 Adam Shaw"
 }

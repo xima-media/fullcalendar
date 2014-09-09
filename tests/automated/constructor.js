@@ -37,8 +37,6 @@ describe('constructor', function() {
 		expect(options).toEqual(optionsCopy);
 	});
 
-	/*
-	TODO: implement this behavior
 	it('should not modify the eventSources array', function() {
 		var options = {
 			defaultView: 'month',
@@ -56,7 +54,6 @@ describe('constructor', function() {
 		$('#calendar').fullCalendar(options);
 		expect(options).toEqual(optionsCopy);
 	});
-	*/
 
 	describe('when called on a div', function() {
 
@@ -64,13 +61,13 @@ describe('constructor', function() {
 			$('#calendar').fullCalendar();
 		});
 
-		it('should contain a table fc-header', function() {
-			var header = $('#calendar > table.fc-header');
+		it('should contain a table fc-toolbar', function() {
+			var header = $('#calendar > .fc-toolbar');
 			expect(header[0]).not.toBeUndefined();
 		});
 
-		it('should contain a div fc-content', function() {
-			var content = ($('#calendar > div.fc-content'));
+		it('should contain a div fc-view-container', function() {
+			var content = ($('#calendar > .fc-view-container'));
 			expect(content[0]).not.toBeUndefined();
 		});
 

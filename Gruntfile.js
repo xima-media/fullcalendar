@@ -11,7 +11,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-jscs-checker');
+	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-karma');
 	grunt.loadNpmTasks('grunt-bump');
 	grunt.loadNpmTasks('lumbar');
@@ -21,8 +23,10 @@ module.exports = function(grunt) {
 	var config = {
 		concat: {},
 		uglify: {},
+		cssmin: {},
 		copy: {},
 		compress: {},
+		shell: {},
 		clean: {
 			temp: 'build/temp'
 		}
@@ -46,6 +50,7 @@ module.exports = function(grunt) {
 
 	// Bare minimum for debugging
 	grunt.registerTask('dev', [
+		'shell:assume-unchanged',
 		'lumbar:build',
 		'languages'
 	]);
@@ -61,7 +66,8 @@ module.exports = function(grunt) {
 		'lumbar:build',
 		'concat:moduleVariables',
 		'jshint:builtModules',
-		'uglify:modules'
+		'uglify:modules',
+		'cssmin:modules'
 	]);
 
 	// assemble modules
@@ -90,7 +96,7 @@ module.exports = function(grunt) {
 		dest: 'dist/'
 	};
 
-	// create minified versions (*.min.js)
+	// create minified versions of JS
 	config.uglify.modules = {
 		options: {
 			preserveComments: 'some' // keep comments starting with /*!
@@ -98,6 +104,13 @@ module.exports = function(grunt) {
 		expand: true,
 		src: 'dist/fullcalendar.js', // only do it for fullcalendar.js
 		ext: '.min.js'
+	};
+
+	// create minified versions of CSS
+	config.cssmin.modules = {
+		expand: true,
+		src: 'dist/fullcalendar.css', // only do it for fullcalendar.css
+		ext: '.min.css'
 	};
 
 	config.clean.modules = [
@@ -218,11 +231,10 @@ module.exports = function(grunt) {
 
 	config.concat.archiveJQueryUI = {
 		src: [
-			'lib/jquery-ui/ui/minified/jquery.ui.core.min.js',
-			'lib/jquery-ui/ui/minified/jquery.ui.widget.min.js',
-			'lib/jquery-ui/ui/minified/jquery.ui.mouse.min.js',
-			'lib/jquery-ui/ui/minified/jquery.ui.draggable.min.js',
-			'lib/jquery-ui/ui/minified/jquery.ui.resizable.min.js'
+			'lib/jquery-ui/ui/minified/core.min.js',
+			'lib/jquery-ui/ui/minified/widget.min.js',
+			'lib/jquery-ui/ui/minified/mouse.min.js',
+			'lib/jquery-ui/ui/minified/draggable.min.js'
 		],
 		dest: 'build/temp/archive/lib/jquery-ui.custom.min.js'
 	};
@@ -253,7 +265,7 @@ module.exports = function(grunt) {
 	function transformDemoPath(path) {
 		path = path.replace('../lib/moment/moment.js', '../lib/moment.min.js');
 		path = path.replace('../lib/jquery/dist/jquery.js', '../lib/jquery.min.js');
-		path = path.replace('../lib/jquery-ui/ui/jquery-ui.js', '../lib/jquery-ui.custom.min.js');
+		path = path.replace('../lib/jquery-ui/jquery-ui.js', '../lib/jquery-ui.custom.min.js');
 		path = path.replace('../lib/jquery-ui/themes/cupertino/', '../lib/cupertino/');
 		path = path.replace('../dist/', '../');
 		path = path.replace('/fullcalendar.js', '/fullcalendar.min.js');
@@ -371,6 +383,24 @@ module.exports = function(grunt) {
 	// configs located elsewhere
 	config.jshint = require('./build/jshint.conf');
 	config.jscs = require('./build/jscs.conf');
+
+
+
+	/* dist & git hacks
+	----------------------------------------------------------------------------------------------------
+	// These shell commands are used to force/unforce git from thinking that files have changed.
+	// Used to ignore changes when dist files are overwritten, but not committed, during development.
+	*/
+
+	config.shell['assume-unchanged'] = {
+		command: 'git update-index --assume-unchanged `git ls-files dist`'
+	};
+	config.shell['no-assume-unchanged'] = {
+		command: 'git update-index --no-assume-unchanged `git ls-files dist`'
+	};
+	config.shell['list-assume-unchanged'] = {
+		command: 'git ls-files -v | grep \'^h\''
+	};
 
 
 

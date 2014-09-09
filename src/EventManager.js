@@ -250,17 +250,24 @@ function EventManager(options) { // assumed to be a calendar
 		}
 		else if (typeof sourceInput === 'object') {
 			source = $.extend({}, sourceInput); // shallow copy
-
-			if (typeof source.className === 'string') {
-				// TODO: repeat code, same code for event classNames
-				source.className = source.className.split(/\s+/);
-			}
 		}
 
 		if (source) {
 
+			// TODO: repeat code, same code for event classNames
+			if (source.className) {
+				if (typeof source.className === 'string') {
+					source.className = source.className.split(/\s+/);
+				}
+				// otherwise, assumed to be an array
+			}
+			else {
+				source.className = [];
+			}
+
 			// for array sources, we convert to standard Event Objects up front
 			if ($.isArray(source.events)) {
+				source.origArray = source.events; // for removeEventSource
 				source.events = $.map(source.events, function(eventInput) {
 					return buildEvent(eventInput, source);
 				});
@@ -293,7 +300,12 @@ function EventManager(options) { // assumed to be a calendar
 
 
 	function getSourcePrimitive(source) {
-		return ((typeof source == 'object') ? (source.events || source.url) : '') || source;
+		return (
+			(typeof source === 'object') ? // a normalized event source?
+				(source.origArray || source.url || source.events) : // get the primitive
+				null
+		) ||
+		source; // the given argument *is* the primitive
 	}
 	
 	

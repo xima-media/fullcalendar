@@ -72,14 +72,13 @@ function formatDateWithChunk(date, chunk) {
 // If the dates are the same as far as the format string is concerned, just return a single
 // rendering of one date, without any separator.
 function formatRange(date1, date2, formatStr, separator, isRTL) {
-
 	var localeData;
 
 	date1 = fc.moment.parseZone(date1);
 	date2 = fc.moment.parseZone(date2);
 
 	localeData = (date1.localeData || date1.lang).call(date1); // works with moment-pre-2.8
-	
+
 	// Expand localized format strings, like "LL" -> "MMMM D YYYY"
 	formatStr = localeData.longDateFormat(formatStr) || formatStr;
 	// BTW, this is not important for `formatDate` because it is impossible to put custom tokens
