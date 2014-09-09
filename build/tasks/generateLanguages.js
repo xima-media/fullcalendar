@@ -208,4 +208,8 @@ module.exports = function(grunt) {
 	}
 
 
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> upstream/master

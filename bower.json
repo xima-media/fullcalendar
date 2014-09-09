@@ -1,12 +1,20 @@
 {
   "name": "fullcalendar",
   "version": "2.1.1",
+<<<<<<< HEAD
   "description": "Full-sized drag & drop event calendar with resources",
   "keywords": [
     "calendar",
     "event",
     "full-sized",
     "Resources"
+=======
+  "description": "Full-sized drag & drop event calendar",
+  "keywords": [
+    "calendar",
+    "event",
+    "full-sized"
+>>>>>>> upstream/master
   ],
   "homepage": "http://arshaw.com/fullcalendar/",
   "dependencies": {
@@ -35,4 +43,8 @@
     "!/license.*",
     "!/readme.*"
   ]
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/master

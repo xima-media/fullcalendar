@@ -1,7 +1,6 @@
 {
   "name": "fullcalendar",
   "version": "2.1.1",
-
   "description": "Full-sized drag & drop event calendar with resources",
   "keywords": [ "calendar", "event", "full-sized", "resources" ],
   "homepage": "http://arshaw.com/fullcalendar/",
@@ -16,7 +15,6 @@
   "docs": "http://arshaw.com/fullcalendar/docs/",
   "download": "",
   "bugs": "https://github.com/seankenny/fullcalendar/issues",
-
   "licenses": [
     {
       "type": "MIT",
