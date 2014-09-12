@@ -2,59 +2,8 @@
 <html>
 <head>
     <link href='../dist/fullcalendar.css' rel='stylesheet' />
-    <link href='../dist/fullcalendar.print.css' rel='stylesheet' media='print' />
-    <style>
-        button {
-            font-size: 11px;
-        }
-    </style>
-</head>
-<body style='font-size:12px'>
-<!--     <p>
-        <button onclick="cal.fullCalendar('prev')">prev</button>
-        <button onclick="cal.fullCalendar('next')">next</button>
-        <button onclick="cal.fullCalendar('today')">today</button>
-        <button onclick="cal.fullCalendar('gotoDate', 1999, 9, 31)">Oct 31 1999</button>
-        <button onclick="cal.fullCalendar('gotoDate', new Date(1999, 9, 30))">Oct 30 1999 (Date)</button>
-        <button onclick="cal.fullCalendar('incrementDate', 1, 1, 1)">+1 +1 +1</button>
-        <button onclick="cal.fullCalendar('incrementDate', -1, -1, -1)">-1 -1 -1</button>
-        <button onclick="updateEventStart()">update event start</button>
-        <button onclick="updateRepeatingEvent()">update repeating event</button>
-        <button onclick="renderEvent(false)">render new event</button>
-        <button onclick="renderEvent(true)">render new sticky event</button>
-        <br />
-        <button onclick="cal.fullCalendar('removeEvents')">remove all</button>
-        <button onclick="cal.fullCalendar('removeEvents', 999)">remove repeating events</button>
-        <button onclick="cal.fullCalendar('removeEvents', function(e){return !e.allDay})">remove timed events</button>
-        <button onclick="console.log(cal.fullCalendar('clientEvents'))">log events</button>
-        <button onclick="console.log(cal.fullCalendar('clientEvents', '999'))">log repeating events</button>
-        <button onclick="console.log(cal.fullCalendar('clientEvents', function(e){return e.allDay}))">log all-day events</button>
-        <br />
-        <button onclick="cal.fullCalendar('addEventSource', staticEvents)">+ static events</button>
-        <button onclick="cal.fullCalendar('removeEventSource', staticEvents)">- static events</button>
-        <button onclick="cal.fullCalendar('addEventSource', gcalFeed)">+ gcal</button>
-        <button onclick="cal.fullCalendar('removeEventSource', gcalFeed)">- gcal</button>
-        <button onclick="cal.fullCalendar('addEventSource', jsonFeed)">+ json</button>
-        <button onclick="cal.fullCalendar('removeEventSource', jsonFeed)">- json</button>
-        <button onclick="cal.fullCalendar('rerenderEvents')">rerender events</button>
-        <button onclick="cal.fullCalendar('refetchEvents')">refetch events</button>
-        <br />
-        <button onclick="cal.fullCalendar('changeView', 'month')">change to month</button>
-        <button onclick="cal.fullCalendar('changeView', 'basicWeek')">change to basicWeek</button>
-        <button onclick="cal.fullCalendar('changeView', 'basicDay')">change to basicDay</button>
-        <button onclick="getView()">getView</button>
-        <button onclick="getDate()">getDate</button>
-        <button onclick="optionGetter()">option getter</button>
-        <button onclick="cal.width(1100)">change width (passive)</button>
-        <button onclick="cal.fullCalendar('render')">render</button>
-        <button onclick="cal.fullCalendar('option', 'height', 1000)">change height</button>
-    </p> -->
-
-    <!--   <div id='loading' style='position:absolute;display:none'>loading...</div>-->
-    <div id='calendar' style='width:70%;margin:20px auto 0;font-family:arial'></div>
 
     <script src='../lib/jquery/dist/jquery.js'></script>
-    <script src='../lib/jquery-ui/ui/jquery-ui.js'></script>
     <script src='../lib/moment/moment.js'></script>
     <script src='../src/defaults.js'></script>
     <script src='../src/main.js'></script>
@@ -66,25 +15,28 @@
     <script src='../src/util.js'></script>
     <script src='../src/moment-ext.js'></script>
     <script src='../src/date-formatting.js'></script>
+    <script src='../src/common/Popover.js'></script>
+    <script src='../src/common/CoordMap.js'></script>
+    <script src='../src/common/DragListener.js'></script>
+    <script src='../src/common/MouseFollower.js'></script>
+    <script src='../src/common/RowRenderer.js'></script>
+    <script src='../src/common/Grid.js'></script>
+    <script src='../src/common/Grid.events.js'></script>
+    <script src='../src/common/DayGrid.js'></script>
+    <script src='../src/common/DayGrid.events.js'></script>
+    <script src='../src/common/DayGrid.limit.js'></script>
+    <script src='../src/common/TimeGrid.js'></script>
+    <script src='../src/common/TimeGrid.events.js'></script>
+    <script src='../src/common/View.js'></script>
+    <script src='../src/basic/BasicView.js'></script>
     <script src='../src/basic/MonthView.js'></script>
     <script src='../src/basic/BasicWeekView.js'></script>
     <script src='../src/basic/BasicDayView.js'></script>
-    <script src='../src/basic/BasicView.js'></script>
-    <script src='../src/basic/BasicEventRenderer.js'></script>
+    <script src='../src/agenda/AgendaView.js'></script>
     <script src='../src/agenda/AgendaWeekView.js'></script>
     <script src='../src/agenda/AgendaDayView.js'></script>
-    <script src='../src/agenda/AgendaView.js'></script>
-    <script src='../src/agenda/AgendaEventRenderer.js'></script>
-    <script src='../src/resource/ResourceDayView.js'></script>
     <script src='../src/resource/ResourceView.js'></script>
-    <script src='../src/resource/ResourceEventRenderer.js'></script>
-    <script src='../src/common/View.js'></script>
-    <script src='../src/common/DayEventRenderer.js'></script>
-    <script src='../src/common/SelectionManager.js'></script>
-    <script src='../src/common/OverlayManager.js'></script>
-    <script src='../src/common/CoordinateGrid.js'></script>
-    <script src='../src/common/HoverListener.js'></script>
-    <script src='../src/common/HorizontalPositionCache.js'></script>
+    <script src='../src/resource/ResourceDayView.js'></script>
     <script src='../dist/gcal.js'></script>
     <script>
         var cal, staticEvents;
@@ -100,8 +52,8 @@
                     console.log(event);
                 },
                 editable: true,
-				selectable: true,
-				selectHelper: true,
+                selectable: true,
+                selectHelper: true,
                 allDaySlot: true,
                 eventDrop: function (event, delta, revertFunc) {
                   //revertFunc();
@@ -113,7 +65,7 @@
                 header: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'resourceDay,agendaDay'
+                    right: 'agendaDay,resourceDay'
                 },
                 defaultView: 'resourceDay',
                 resources: [
@@ -208,5 +160,9 @@
 
 
     </script>
+</head>
+
+<body>
+<div id='calendar'></div>
 </body>
 </html>
