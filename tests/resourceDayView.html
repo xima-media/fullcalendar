@@ -75,18 +75,18 @@
                   { 'id': 'resource2', 'name': 'Resource 2', 'className': ['green', 'another-css-class-name'] },
                   { 'id': 'resource3', 'name': 'Resource 3' }],
                 events: [
-                 {
-                      title: 'R1: All day',
-                      allDay: true,
-                      start: new Date(y, m, d, 12, 0),
-                      resources: 'resource1'
-                  },
-                  {
-                      title: 'R2: All Day',
-                      start: new Date(y, m, d, 12, 0),
-                      allDay: true,
-                      resources: 'resource2'
-                  },
+                 // {
+                 //      title: 'R1: All day',
+                 //      allDay: true,
+                 //      start: new Date(y, m, d, 12, 0),
+                 //      resources: 'resource1'
+                 //  },
+                  // {
+                  //     title: 'R2: All Day',
+                  //     start: new Date(y, m, d, 12, 0),
+                  //     allDay: true,
+                  //     resources: 'resource2'
+                  // },
                   {
                       title: 'R1/R2: 12-14',
                       start: new Date(y, m, d, 12, 0),
@@ -96,15 +96,15 @@
                   },
                   {
                       title: 'R1: 14:30-16',
-                      start: new Date(y, m, d, 14, 30),
-                      end: new Date(y, m, d, 16, 0),
+                      start: new Date(y, m, d, 09, 00),
+                      end: new Date(y, m, d, 10, 0),
                       allDay: false,
                       resources: ['resource1']
                   },
                   {
                       title: 'R2: 10:00-10:30',
-                      start: new Date(y, m, d, 10, 0),
-                      end: new Date(y, m, d, 10, 30),
+                      start: new Date(y, m, d, 11, 0),
+                      end: new Date(y, m, d, 11, 30),
                       allDay: false,
                       resources: ['resource2']
                   }
