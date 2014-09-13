@@ -48,7 +48,7 @@ function ResourceView(calendar) {
 	this.timeGrid = new ResourceTimeGrid(this);
 
 	if (this.opt('allDaySlot')) { // should we display the "all-day" area?
-		this.dayGrid = new DayGrid(this); // the all-day subcomponent of this view
+		this.dayGrid = new ResourceDayGrid(this); // the all-day subcomponent of this view
 
 		// the coordinate grid will be a combination of both subcomponents' grids
 		this.coordMap = new ComboCoordMap([
