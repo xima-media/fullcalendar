@@ -11,20 +11,23 @@ ResourceDayGrid.prototype = createObject(DayGrid.prototype); // declare the supe
 $.extend(ResourceDayGrid.prototype, {
 	rangeToSegs: function(rangeStart, rangeEnd, resourceIds) {
 		var segments = []; 
-		var view = this.view;
-
-		var resources = view.calendar.fetchResources();
-	
-		for (col = 0; col < view.colCnt; col++) {
-      var resource = resources[col];
-      if (resourceIds.indexOf(resource.id) > -1){
-				segments.push({
-					row: 0,
-					leftCol: col,
-					rightCol: col,
-					isStart: true,
-					isEnd: true
-				});
+		
+		var currentDate = this.view.calendar.getDate();
+		if((rangeStart <= currentDate) && (currentDate < rangeEnd)) {
+			var view = this.view;
+			var resources = view.calendar.fetchResources();
+		
+			for (col = 0; col < view.colCnt; col++) {
+	      var resource = resources[col];
+	      if (resourceIds.indexOf(resource.id) > -1){
+					segments.push({
+						row: 0,
+						leftCol: col,
+						rightCol: col,
+						isStart: true,
+						isEnd: true
+					});
+				}
 			}
 		}
 
