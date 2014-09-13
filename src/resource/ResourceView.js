@@ -45,7 +45,7 @@ function ResourceView(calendar) {
 	// overrides - the view.js should expose these on the prototype then we wouldn't have to do this.
 	this.cellToDate = ResourceView.prototype.cellToDate;
 
-	this.timeGrid = new TimeGrid(this);
+	this.timeGrid = new ResourceTimeGrid(this);
 
 	if (this.opt('allDaySlot')) { // should we display the "all-day" area?
 		this.dayGrid = new DayGrid(this); // the all-day subcomponent of this view
