@@ -22,23 +22,6 @@ setDefaults({
 	slotEventOverlap: true
 });
 
-var AGENDA_ALL_DAY_EVENT_LIMIT = 5;
-
-
-function generateAgendaAxisFormat(options, langData) {
-	return langData.longDateFormat('LT')
-		.replace(':mm', '(:mm)')
-		.replace(/(\Wmm)$/, '($1)') // like above, but for foreign langs
-		.replace(/\s*a$/i, 'a'); // convert AM/PM/am/pm to lowercase. remove any spaces beforehand
-}
-
-
-function generateAgendaTimeFormat(options, langData) {
-	return langData.longDateFormat('LT')
-		.replace(/\s*a$/i, ''); // remove trailing AM/PM
-}
-
-
 function ResourceView(calendar) {
 	View.call(this, calendar); // call the super-constructor
 
@@ -73,12 +56,11 @@ $.extend(ResourceView.prototype, {
 	headCellHtml: function(row, col, date) {
 		var view = this;
 		var calendar = view.calendar;
-		var colFormat = view.opt('columnFormat');
-		var resource = this.calendar.fetchResources()[col];
+		var resource = calendar.fetchResources()[col];
 		return '' +
 			'<th class="fc-day-header ' + view.widgetHeaderClass + ' fc-' + resource.id + '">' +
-				htmlEscape(resource.name) + 
+				htmlEscape(resource.name) +
 			'</th>';
-	}	
+	}
 
 });

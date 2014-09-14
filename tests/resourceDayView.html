@@ -59,12 +59,6 @@
                 selectable: true,
                 selectHelper: true,
                 allDaySlot: true,
-                eventDrop: function (event, delta, revertFunc) {
-                  //revertFunc();
-                },
-                eventResize: function (event, delta, revertFunc) {
-                  //revertFunc();
-                },
                 // weekends: false,
                 header: {
                     left: 'prev,next today',
@@ -110,7 +104,17 @@
                       allDay: false,
                       resources: ['resource2']
                   }
-                ]
+                ],
+                eventDrop: function(event, delta, revertFunc) {
+                  if (!confirm("Are you sure about this change?")) {
+                    revertFunc();
+                  }
+                },
+                eventResize: function (event, delta, revertFunc) {
+                  if (!confirm("Are you sure about this change?")) {
+                    revertFunc();
+                  }
+                }
             });
         });
 

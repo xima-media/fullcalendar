@@ -10,7 +10,7 @@ function ResourceDayGrid(view) {
 ResourceDayGrid.prototype = createObject(DayGrid.prototype); // declare the super-class
 $.extend(ResourceDayGrid.prototype, {
 	rangeToSegs: function(rangeStart, rangeEnd, resourceIds) {
-		var segments = []; 
+		var col, segments = [];
 		
 		var currentDate = this.view.calendar.getDate();
 		if((rangeStart <= currentDate) && (currentDate < rangeEnd)) {
