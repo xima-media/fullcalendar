@@ -1,7 +1,7 @@
 /*!
  * FullCalendar v2.1.1
  * Docs & License: http://arshaw.com/fullcalendar/
- * (c) 2013 Adam Shaw
+ * (c) 2014 Adam Shaw, Sean Kenny
  */
 
 (function(factory) {
@@ -571,7 +571,7 @@ function Calendar(element, instanceOptions) {
 
 
 	EventManager.call(t, options);
-	//ResourceManager.call(t, options);
+	ResourceManager.call(t, options);
 	var isFetchNeeded = t.isFetchNeeded;
 	var fetchEvents = t.fetchEvents;
 
@@ -2012,6 +2012,321 @@ function backupEventDates(event) {
 	event._allDay = event.allDay;
 	event._start = event.start.clone();
 	event._end = event.end ? event.end.clone() : null;
+}
+
+;;
+function ResourceManager(options) {
+  var t = this;
+  // exports
+  t.fetchResources = fetchResources;
+  t.setResources = setResources;
+  t.mutateResourceEvent = mutateResourceEvent;
+  // locals
+  var resourceSources = [];
+  var cache;
+  // initialize the resources.
+  setResources(options.resources);
+  // add the resource sources
+
+  function setResources(sources) {
+    resourceSources = [];
+    var resource;
+    if ($.isFunction(sources)) {
+      // is it a function?
+      resource = {
+        resources: sources
+      };
+      resourceSources.push(resource);
+      cache = undefined;
+    } else if (typeof sources == 'string') {
+      // is it a URL string?
+      resource = {
+        url: sources
+      };
+      resourceSources.push(resource);
+      cache = undefined;
+    } else if (typeof sources == 'object' && sources != null) {
+      // is it json object?
+      for (var i = 0; i < sources.length; i++) {
+        var s = sources[i];
+        normalizeSource(s);
+        resource = {
+          resources: s
+        };
+        resourceSources.push(resource);
+      }
+      cache = undefined;
+    }
+  }
+  /**
+   * ----------------------------------------------------------------
+   * Fetch resources from source array
+   * ----------------------------------------------------------------
+   */
+
+  function fetchResources(useCache, currentView) {
+    var cache;
+    // if useCache is not defined, default to true
+    useCache = (typeof useCache !== 'undefined' ? useCache : true);
+    if (!useCache || cache === undefined) {
+      // do a fetch resource from source, rebuild cache
+      cache = [];
+      var len = resourceSources.length;
+      for (var i = 0; i < len; i++) {
+        var resources = fetchResourceSource(resourceSources[i], currentView);
+        cache = cache.concat(resources);
+      }
+    }
+
+    if($.isFunction(options.resourceFilter)) {
+      return $.grep(cache, options.resourceFilter);
+    }
+
+    return cache;
+  }
+
+  /**
+   * ----------------------------------------------------------------
+   * Fetch resources from each source.  If source is a function, call
+   * the function and return the resource.  If source is a URL, get
+   * the data via synchronized ajax call.  If the source is an
+   * object, return it as is.
+   * ----------------------------------------------------------------
+   */
+
+  function fetchResourceSource(source, currentView) {
+    var resources = source.resources;
+    if (resources) {
+      if ($.isFunction(resources)) {
+        return resources();
+      }
+    } else {
+      var url = source.url;
+      if (url) {
+        var data = {};
+        if (typeof currentView === 'object') {
+          var startParam = options.startParam;
+          var endParam = options.endParam;
+          if (startParam) {
+            data[startParam] = Math.round(+currentView.intervalStart / 1000);
+          }
+          if (endParam) {
+            data[endParam] = Math.round(+currentView.intervalEnd / 1000);
+          }
+        }
+        $.ajax($.extend({}, ajaxDefaults, source, {
+          data: data,
+          dataType: 'json',
+          cache: false,
+          success: function(res) {
+            res = res || [];
+            resources = res;
+          },
+          error: function() {
+            // TODO - need to rewrite callbacks, etc.
+            //alert("ajax error getting json from " + url);
+          },
+          async: false // too much work coordinating callbacks so dumb it down
+        }));
+      }
+    }
+    return resources;
+  }
+  /**
+   * ----------------------------------------------------------------
+   * normalize the source object
+   * ----------------------------------------------------------------
+   */
+
+  function normalizeSource(source) {
+    if (source.className) {
+      if (typeof source.className == 'string') {
+        source.className = source.className.split(/\s+/);
+      }
+    } else {
+      source.className = [];
+    }
+    var normalizers = fc.sourceNormalizers;
+    for (var i = 0; i < normalizers.length; i++) {
+      normalizers[i](source);
+    }
+  }
+
+  /* Event Modification Math
+  -----------------------------------------------------------------------------------------*/
+
+
+  // Modify the date(s) of an event and make this change propagate to all other events with
+  // the same ID (related repeating events).
+  //
+  // If `newStart`/`newEnd` are not specified, the "new" dates are assumed to be `event.start` and `event.end`.
+  // The "old" dates to be compare against are always `event._start` and `event._end` (set by EventManager).
+  //
+  // Returns an object with delta information and a function to undo all operations.
+  //
+  function mutateResourceEvent(event, newResources, newStart, newEnd) {
+    var oldAllDay = event._allDay;
+    var oldStart = event._start;
+    var oldEnd = event._end;
+    var clearEnd = false;
+    var newAllDay;
+    var dateDelta;
+    var durationDelta;
+    var undoFunc;
+
+    // if no new dates were passed in, compare against the event's existing dates
+    if (!newStart && !newEnd) {
+      newStart = event.start;
+      newEnd = event.end;
+    }
+
+    // NOTE: throughout this function, the initial values of `newStart` and `newEnd` are
+    // preserved. These values may be undefined.
+
+    // detect new allDay
+    if (event.allDay != oldAllDay) { // if value has changed, use it
+      newAllDay = event.allDay;
+    }
+    else { // otherwise, see if any of the new dates are allDay
+      newAllDay = !(newStart || newEnd).hasTime();
+    }
+
+    // normalize the new dates based on allDay
+    if (newAllDay) {
+      if (newStart) {
+        newStart = newStart.clone().stripTime();
+      }
+      if (newEnd) {
+        newEnd = newEnd.clone().stripTime();
+      }
+    }
+
+    // compute dateDelta
+    if (newStart) {
+      if (newAllDay) {
+        dateDelta = dayishDiff(newStart, oldStart.clone().stripTime()); // treat oldStart as allDay
+      }
+      else {
+        dateDelta = dayishDiff(newStart, oldStart);
+      }
+    }
+
+    if (newAllDay != oldAllDay) {
+      // if allDay has changed, always throw away the end
+      clearEnd = true;
+    }
+    else if (newEnd) {
+      durationDelta = dayishDiff(
+        // new duration
+        newEnd || t.getDefaultEventEnd(newAllDay, newStart || oldStart),
+        newStart || oldStart
+      ).subtract(dayishDiff(
+        // subtract old duration
+        oldEnd || t.getDefaultEventEnd(oldAllDay, oldStart),
+        oldStart
+      ));
+    }
+
+    undoFunc = mutateResourceEvents(
+      t.clientEvents(event._id), // get events with this ID
+      clearEnd,
+      newAllDay,
+      dateDelta,
+      durationDelta,
+      newResources
+    );
+
+    return {
+      dateDelta: dateDelta,
+      durationDelta: durationDelta,
+      undo: undoFunc
+    };
+  }
+
+
+  // Modifies an array of events in the following ways (operations are in order):
+  // - clear the event's `end`
+  // - convert the event to allDay
+  // - add `dateDelta` to the start and end
+  // - add `durationDelta` to the event's duration
+  //
+  // Returns a function that can be called to undo all the operations.
+  //
+  function mutateResourceEvents(events, clearEnd, forceAllDay, dateDelta, durationDelta, newResources) {
+    var isAmbigTimezone = t.getIsAmbigTimezone();
+    var undoFunctions = [];
+
+    $.each(events, function(i, event) {
+      var oldResources = event.resources;
+      var oldAllDay = event._allDay;
+      var oldStart = event._start;
+      var oldEnd = event._end;
+      var newAllDay = forceAllDay != null ? forceAllDay : oldAllDay;
+      var newStart = oldStart.clone();
+      var newEnd = (!clearEnd && oldEnd) ? oldEnd.clone() : null;
+
+      // NOTE: this function is responsible for transforming `newStart` and `newEnd`,
+      // which were initialized to the OLD values first. `newEnd` may be null.
+
+      // normlize newStart/newEnd to be consistent with newAllDay
+      if (newAllDay) {
+        newStart.stripTime();
+        if (newEnd) {
+          newEnd.stripTime();
+        }
+      }
+      else {
+        if (!newStart.hasTime()) {
+          newStart = t.rezoneDate(newStart);
+        }
+        if (newEnd && !newEnd.hasTime()) {
+          newEnd = t.rezoneDate(newEnd);
+        }
+      }
+
+      // ensure we have an end date if necessary
+      if (!newEnd && (options.forceEventDuration || +durationDelta)) {
+        newEnd = t.getDefaultEventEnd(newAllDay, newStart);
+      }
+
+      // translate the dates
+      newStart.add(dateDelta);
+      if (newEnd) {
+        newEnd.add(dateDelta).add(durationDelta);
+      }
+
+      // if the dates have changed, and we know it is impossible to recompute the
+      // timezone offsets, strip the zone.
+      if (isAmbigTimezone) {
+        if (+dateDelta || +durationDelta) {
+          newStart.stripZone();
+          if (newEnd) {
+            newEnd.stripZone();
+          }
+        }
+      }
+
+      event.allDay = newAllDay;
+      event.start = newStart;
+      event.end = newEnd;
+      event.resources = newResources;
+      backupEventDates(event);
+
+      undoFunctions.push(function() {
+        event.allDay = oldAllDay;
+        event.start = oldStart;
+        event.end = oldEnd;
+        event.resources = oldResources;
+        backupEventDates(event);
+      });
+    });
+
+    return function() {
+      for (var i=0; i<undoFunctions.length; i++) {
+        undoFunctions[i]();
+      }
+    };
+  }
 }
 
 ;;
@@ -8231,7 +8546,7 @@ $.extend(AgendaView.prototype, {
 		// the all-day area is flexible and might have a lot of events, so shift the height
 		this.updateHeight();
 
-		View.prototype.renderEvents.call(this, events); // call the super-method
+		// /View.prototype.renderEvents.call(this, events); // call the super-method
 	},
 
 
@@ -8394,6 +8709,288 @@ $.extend(AgendaDayView.prototype, {
 
 });
 
+;;
+
+/* A component that renders a grid of whole-days that runs horizontally. There can be multiple rows, one per week.
+----------------------------------------------------------------------------------------------------------------------*/
+
+function ResourceDayGrid(view) {
+	DayGrid.call(this, view); // call the super-constructor
+}
+
+
+ResourceDayGrid.prototype = createObject(DayGrid.prototype); // declare the super-class
+$.extend(ResourceDayGrid.prototype, {
+	rangeToSegs: function(rangeStart, rangeEnd, resourceIds) {
+		var col, segments = [];
+		
+		var currentDate = this.view.calendar.getDate();
+		if((rangeStart <= currentDate) && (currentDate < rangeEnd)) {
+			var view = this.view;
+			var resources = view.calendar.fetchResources();
+		
+			for (col = 0; col < view.colCnt; col++) {
+	      var resource = resources[col];
+	      if (resourceIds.indexOf(resource.id) > -1){
+					segments.push({
+						row: 0,
+						leftCol: col,
+						rightCol: col,
+						isStart: true,
+						isEnd: true
+					});
+				}
+			}
+		}
+
+		return segments;
+	}
+});
+;;
+
+/* Event-rendering methods for the DayGrid class
+----------------------------------------------------------------------------------------------------------------------*/
+
+$.extend(ResourceDayGrid.prototype, {
+	eventToSegs: function(event, intervalStart, intervalEnd) {
+		var eventStart = event.start.clone().stripZone(); // normalize
+    var eventEnd = this.view.calendar.getEventEnd(event).stripZone(); // compute (if necessary) and normalize
+    var segs;
+    var i, seg;
+
+    if (intervalStart && intervalEnd) {
+      seg = intersectionToSeg(eventStart, eventEnd, intervalStart, intervalEnd);
+      segs = seg ? [ seg ] : [];
+    }
+    else {
+      segs = this.rangeToSegs(eventStart, eventEnd, event.resources); // defined by the subclass
+    }
+
+    // assign extra event-related properties to the segment objects
+    for (i = 0; i < segs.length; i++) {
+      seg = segs[i];
+      seg.event = event;
+      seg.eventStartMS = +eventStart;
+      seg.eventDurationMS = eventEnd - eventStart;
+    }
+
+    return segs;
+  }
+});
+;;
+
+/* A component that renders one or more columns of vertical time slots
+----------------------------------------------------------------------------------------------------------------------*/
+
+function ResourceTimeGrid(view) {
+	TimeGrid.call(this, view); // call the super-constructor
+}
+
+
+ResourceTimeGrid.prototype = createObject(TimeGrid.prototype); // define the super-class
+$.extend(ResourceTimeGrid.prototype, {
+// Slices up a date range into a segment for each column
+// Each column represents a resource.  An event can be assigned to multiple resources
+// so we need to build segs accordingly
+  rangeToSegs: function(rangeStart, rangeEnd, resourceIds) {
+    var view = this.view;
+    var segs = [];
+    var seg;
+    var col;
+    var cellDate;
+    var colStart, colEnd;
+
+    var resources = view.calendar.fetchResources();
+
+    // normalize
+    rangeStart = rangeStart.clone().stripZone();
+    rangeEnd = rangeEnd.clone().stripZone();
+
+    for (col = 0; col < view.colCnt; col++) {
+      var resource = resources[col];
+      if (resourceIds.indexOf(resource.id) > -1){
+        cellDate = view.cellToDate(0, col); // use the View's cell system for this
+        colStart = cellDate.clone().time(this.minTime);
+        colEnd = cellDate.clone().time(this.maxTime);
+        seg = intersectionToSeg(rangeStart, rangeEnd, colStart, colEnd);
+        if (seg) {
+          seg.col = col;
+          segs.push(seg);
+        }
+      }
+    }
+
+    return segs;
+  }
+
+});
+
+;;
+
+/* Event-rendering methods for the TimeGrid class
+----------------------------------------------------------------------------------------------------------------------*/
+
+$.extend(ResourceTimeGrid.prototype, {
+// Slices a single event into an array of event segments.
+  // When `intervalStart` and `intervalEnd` are specified, intersect the events with that interval.
+  // Otherwise, let the subclass decide how it wants to slice the segments over the grid.
+  eventToSegs: function(event, intervalStart, intervalEnd) {
+    var eventStart = event.start.clone().stripZone(); // normalize
+    var eventEnd = this.view.calendar.getEventEnd(event).stripZone(); // compute (if necessary) and normalize
+    var segs;
+    var i, seg;
+
+    if (intervalStart && intervalEnd) {
+      seg = intersectionToSeg(eventStart, eventEnd, intervalStart, intervalEnd);
+      segs = seg ? [ seg ] : [];
+    }
+    else {
+      segs = this.rangeToSegs(eventStart, eventEnd, event.resources); // defined by the subclass
+    }
+
+    // assign extra event-related properties to the segment objects
+    for (i = 0; i < segs.length; i++) {
+      seg = segs[i];
+      seg.event = event;
+      seg.eventStartMS = +eventStart;
+      seg.eventDurationMS = eventEnd - eventStart;
+    }
+
+    return segs;
+  }
+});
+
+;;
+
+/* An abstract class for all agenda-related views. Displays one more columns with time slots running vertically.
+----------------------------------------------------------------------------------------------------------------------*/
+// Is a manager for the TimeGrid subcomponent and possibly the DayGrid subcomponent (if allDaySlot is on).
+// Responsible for managing width/height.
+
+setDefaults({
+	allDaySlot: true,
+	allDayText: 'all-day',
+
+	scrollTime: '06:00:00',
+
+	slotDuration: '00:30:00',
+
+	axisFormat: generateAgendaAxisFormat,
+	timeFormat: {
+		agenda: generateAgendaTimeFormat
+	},
+
+	minTime: '00:00:00',
+	maxTime: '24:00:00',
+	slotEventOverlap: true
+});
+
+function ResourceView(calendar) {
+	View.call(this, calendar); // call the super-constructor
+
+	// overrides - the view.js should expose these on the prototype then we wouldn't have to do this.
+	this.cellToDate = ResourceView.prototype.cellToDate;
+
+	this.timeGrid = new ResourceTimeGrid(this);
+
+	if (this.opt('allDaySlot')) { // should we display the "all-day" area?
+		this.dayGrid = new ResourceDayGrid(this); // the all-day subcomponent of this view
+
+		// the coordinate grid will be a combination of both subcomponents' grids
+		this.coordMap = new ComboCoordMap([
+			this.dayGrid.coordMap,
+			this.timeGrid.coordMap
+		]);
+	}
+	else {
+		this.coordMap = this.timeGrid.coordMap;
+	}
+}
+
+
+ResourceView.prototype = createObject(AgendaView.prototype); // define the super-class
+$.extend(ResourceView.prototype, {
+
+	cellToDate: function() {
+		return this.start.clone();
+	},
+
+	// fix the classes, etc.
+	headCellHtml: function(row, col, date) {
+		var view = this;
+		var calendar = view.calendar;
+		var resource = calendar.fetchResources()[col];
+		return '' +
+			'<th class="fc-day-header ' + view.widgetHeaderClass + ' fc-' + resource.id + '">' +
+				htmlEscape(resource.name) +
+			'</th>';
+	}
+
+});
+
+;;
+
+/* A day view with an all-day cell area at the top, and a time grid below by resource
+----------------------------------------------------------------------------------------------------------------------*/
+
+fcViews.resourceDay = ResourceDayView;
+
+function ResourceDayView(calendar) { // TODO: make a ResourceView mixin
+	ResourceView.call(this, calendar); // call the super-constructor
+}
+
+ResourceDayView.prototype = createObject(ResourceView.prototype); // define the super-class
+$.extend(ResourceDayView.prototype, {
+
+	name: 'resourceDay',
+
+
+	incrementDate: function(date, delta) {
+		var out = date.clone().stripTime().add(delta, 'days');
+		out = this.skipHiddenDays(out, delta < 0 ? -1 : 1);
+		return out;
+	},
+
+
+	render: function(date) {
+		this.start = this.intervalStart = date.clone().stripTime();
+		this.end = this.intervalEnd = this.start.clone().add(1, 'days');
+
+		this.title = this.calendar.formatDate(this.start, this.opt('titleFormat'));
+		
+		ResourceView.prototype.render.call(this, this.calendar.fetchResources().length); // call the super-method
+	},
+
+	// Computes HTML classNames for a single-day cell
+	getDayClasses: function(date) {
+		var view = this.view;
+		var today = view.calendar.getNow().stripTime();
+		var classes = [ 'fc-' + dayIDs[date.day()] ];
+
+		if (
+			view.name === 'month' &&
+			date.month() != view.intervalStart.month()
+		) {
+			classes.push('fc-other-month');
+		}
+
+		if (date.isSame(today, 'day')) {
+			classes.push(
+				'fc-todaysss',
+				view.highlightStateClass
+			);
+		}
+		else if (date < today) {
+			classes.push('fc-past');
+		}
+		else {
+			classes.push('fc-future');
+		}
+
+		return classes;
+	}
+
+});
 ;;
 
 });
