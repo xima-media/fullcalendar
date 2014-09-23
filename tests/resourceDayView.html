@@ -58,15 +58,14 @@
                 editable: true,
                 selectable: true,
                 selectHelper: true,
-                // allDaySlot: true,
-                weekMode: 'liquid',
+                allDaySlot: true,
                 // weekends: false,
                 header: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'month,agendaDay,resourceDay'
+                    right: 'agendaDay,resourceDay'
                 },
-                defaultView: 'month',
+                defaultView: 'resourceDay',
                 resources: [
                   { 'id': 'resource1', 'name': 'Resource 1', 'className': 'css-class-as-string' },
                   { 'id': 'resource2', 'name': 'Resource 2', 'className': ['green', 'another-css-class-name'] },
