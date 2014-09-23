@@ -65,7 +65,8 @@ describe('weekMode', function() {
 	describe('when weekMode is set to liquid', function() {
 		beforeEach(function() {
 			$('#cal').fullCalendar({
-				weekMode: 'liquid'
+				weekMode: 'liquid',
+				defaultView: 'month'
 			});
 		});
 		it('should show 5 weeks for a 5 week month', function() {
