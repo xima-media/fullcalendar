@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/seankenny/fullcalendar.png?branch=master)](https://travis-ci.org/seankenny/fullcalendar)
 
 #FORK INFO
+##v2.1.1 BETA!
 This fork adds a vertical resource view to FullCalendar.  Some details on usage, etc are available here:
 <a href="http://www.seankenny.me/blog/2013/08/14/fullcalendar-with-a-resource-day-view/" target="_blank">http://www.seankenny.me/blog/2013/08/14/fullcalendar-with-a-resource-day-view/</a>
 <a href="http://www.seankenny.me/blog/2014/07/24/resource-fullcalendar-dragging-and-clicking/" target="_blank">http://www.seankenny.me/blog/2014/07/24/resource-fullcalendar-dragging-and-clicking/</a>
