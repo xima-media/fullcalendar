@@ -1,7 +1,7 @@
 /*!
  * FullCalendar v2.1.1
  * Docs & License: http://arshaw.com/fullcalendar/
- * (c) 2013 Adam Shaw
+ * (c) 2014 Adam Shaw, Sean Kenny
  */
 
 (function(factory) {
@@ -8546,7 +8546,7 @@ $.extend(AgendaView.prototype, {
 		// the all-day area is flexible and might have a lot of events, so shift the height
 		this.updateHeight();
 
-		// /View.prototype.renderEvents.call(this, events); // call the super-method
+		View.prototype.renderEvents.call(this, events); // call the super-method
 	},
 
 

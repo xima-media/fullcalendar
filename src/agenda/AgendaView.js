@@ -347,7 +347,7 @@ $.extend(AgendaView.prototype, {
 		// the all-day area is flexible and might have a lot of events, so shift the height
 		this.updateHeight();
 
-		// /View.prototype.renderEvents.call(this, events); // call the super-method
+		View.prototype.renderEvents.call(this, events); // call the super-method
 	},
 
 
