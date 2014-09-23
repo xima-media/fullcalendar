@@ -26,6 +26,6 @@
   },
   "scripts": {
     "install": "bower install",
-    "test": "./node_modules/karma/bin/karma start ./build/karma.conf.js --single-run --browsers PhantomJS"
+    "test": "grunt karma:single"
   }
 }
