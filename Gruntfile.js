@@ -49,8 +49,8 @@ module.exports = function(grunt) {
 	]);
 
 	// Bare minimum for debugging
+	//'shell:assume-unchanged',
 	grunt.registerTask('dev', [
-		'shell:assume-unchanged',
 		'lumbar:build',
 		'languages'
 	]);
