@@ -40,6 +40,7 @@ function generateAgendaTimeFormat(options, langData) {
 
 
 function HAgendaView(calendar) {
+	debugger;
 	View.call(this, calendar); // call the super-constructor
 
 	this.timeGrid = new HTimeGrid(this);

@@ -66,7 +66,6 @@ $.extend(HTimeGrid.prototype, {
 
 	// Generates the HTML for the horizontal "slats" that run width-wise. Has a time axis on a side. Depends on RTL.
 	slatRowHtml: function() {
-		debugger;
 		var view = this.view;
 		var calendar = view.calendar;
 		var isRTL = view.opt('isRTL');
@@ -77,16 +76,15 @@ $.extend(HTimeGrid.prototype, {
 		var minutes;
 		var axisHtml;
 
-		// Calculate the time for each slot
-		while (slotTime < this.maxTime) {
-			slotDate = view.start.clone().time(slotTime); // will be in UTC but that's good. to avoid DST issues
-			minutes = slotDate.minutes();
+		var resources = calendar.fetchResources();
 
+		for(var i = 0; i < resources.length - 1; i++){
 			axisHtml =
 				'<td class="fc-axis fc-time ' + view.widgetContentClass + '" ' + view.axisStyleAttr() + '>' +
 					((!slotNormal || !minutes) ? // if irregular slot duration, or on the hour, then display the time
 						'<span>' + // for matchCellWidths
-							htmlEscape(calendar.formatDate(slotDate, view.opt('axisFormat'))) +
+							//htmlEscape(calendar.formatDate(slotDate, view.opt('axisFormat'))) +
+							resources[i].name +
 						'</span>' :
 						''
 						) +
@@ -98,8 +96,6 @@ $.extend(HTimeGrid.prototype, {
 					'<td class="' + view.widgetContentClass + '"/>' +
 					(isRTL ? axisHtml : '') +
 				"</tr>";
-
-			slotTime.add(this.slotDuration);
 		}
 
 		return html;

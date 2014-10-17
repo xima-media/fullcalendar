@@ -3,11 +3,11 @@
 ----------------------------------------------------------------------------------------------------------------------*/
 
 function HResourceTimeGrid(view) {
-	TimeGrid.call(this, view); // call the super-constructor
+	HTimeGrid.call(this, view); // call the super-constructor
 }
 
 
-HResourceTimeGrid.prototype = createObject(TimeGrid.prototype); // define the super-class
+HResourceTimeGrid.prototype = createObject(HTimeGrid.prototype); // define the super-class
 $.extend(HResourceTimeGrid.prototype, {
 // Slices up a date range into a segment for each column
 // Each column represents a resource.  An event can be assigned to multiple resources
