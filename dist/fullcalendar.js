@@ -1810,6 +1810,10 @@ function EventManager(options) { // assumed to be a calendar
 		}
 		
 		if (out.resources) {
+			if (typeof out.resources == 'number') {
+				out.resources = [out.resources];
+			}
+
 			if (typeof out.resources == 'string') {
 				out.resources = out.resources.split(/\s+/);
 			}
@@ -3621,6 +3625,7 @@ ComboCoordMap.prototype = {
 	}
 
 };
+
 ;;
 
 /* Tracks mouse movements over a CoordMap and raises events about which cell the mouse is over.
@@ -8546,7 +8551,7 @@ $.extend(AgendaView.prototype, {
 		// the all-day area is flexible and might have a lot of events, so shift the height
 		this.updateHeight();
 
-		// /View.prototype.renderEvents.call(this, events); // call the super-method
+		View.prototype.renderEvents.call(this, events); // call the super-method
 	},
 
 
