@@ -72,7 +72,7 @@
                   { 'id': 'resource3', 'name': 'Resource 3' }],
                 events: [
                  {
-                      title: 'R1: All day',
+                      title: 'R1/R3: All day',
                       allDay: true,
                       start: new Date(y, m, d, 12, 0),
                       resources: ['resource1', 'resource3']
@@ -106,14 +106,14 @@
                   }
                 ],
                 eventDrop: function(event, delta, revertFunc) {
-                  if (!confirm("Are you sure about this change?")) {
-                    revertFunc();
-                  }
+                  // if (!confirm("Are you sure about this change?")) {
+                  //   revertFunc();
+                  // }
                 },
                 eventResize: function (event, delta, revertFunc) {
-                  if (!confirm("Are you sure about this change?")) {
-                    revertFunc();
-                  }
+                  // if (!confirm("Are you sure about this change?")) {
+                  //   revertFunc();
+                  // }
                 }
             });
         });
