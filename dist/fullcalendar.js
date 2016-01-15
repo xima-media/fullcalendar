@@ -2694,7 +2694,7 @@ function makeMoment(args, parseAsUTC, parseZone) {
 				output._ambigZone = true;
 			}
 			else if (isSingleString) {
-				output.zone(input); // if not a valid zone, will assign UTC
+				output.utcOffset(input); // if not a valid zone, will assign UTC
 			}
 		}
 	}
@@ -2832,7 +2832,7 @@ FCMoment.prototype.hasZone = function() {
 };
 
 // this method implicitly marks a zone
-FCMoment.prototype.zone = function(tzo) {
+FCMoment.prototype.utcOffset = function(tzo) {
 
 	if (tzo != null) {
 		// FYI, the delete statements need to be before the .zone() call or else chaos ensues
@@ -2841,7 +2841,7 @@ FCMoment.prototype.zone = function(tzo) {
 		delete this._ambigZone;
 	}
 
-	return moment.fn.zone.apply(this, arguments);
+	return moment.fn.utcOffset.apply(this, arguments);
 };
 
 // this method implicitly marks a zone
