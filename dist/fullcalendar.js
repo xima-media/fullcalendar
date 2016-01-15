@@ -4419,7 +4419,8 @@ function AgendaView(element, calendar, viewName) {
 		var slotHeight0 = slotTable.find('tr:first').height() + 1; // +1 for bottom border
 		var slotHeight1 = slotTable.find('tr:eq(1)').height();
 		// HACK: i forget why we do this, but i think a cross-browser issue
-		slotHeight = (slotHeight0 + slotHeight1) / 2;
+		// add slotHeight adjustment to prevent misplacing issue by selecting new timeslot
+		slotHeight = (slotHeight0 + slotHeight1) / 2 - 0.5;
 
 		snapRatio = slotDuration / snapDuration;
 		snapHeight = slotHeight / snapRatio;
@@ -6352,7 +6353,8 @@ function ResourceView(element, calendar, viewName) {
 		var slotHeight0 = slotTable.find('tr:first').height() + 1; // +1 for bottom border
 		var slotHeight1 = slotTable.find('tr:eq(1)').height();
 		// HACK: i forget why we do this, but i think a cross-browser issue
-		slotHeight = (slotHeight0 + slotHeight1) / 2;
+		// add slotHeight adjustment to prevent misplacing issue by selecting new timeslot
+		slotHeight = (slotHeight0 + slotHeight1) / 2 - 0.5;
 
 		snapRatio = slotDuration / snapDuration;
 		snapHeight = slotHeight / snapRatio;
